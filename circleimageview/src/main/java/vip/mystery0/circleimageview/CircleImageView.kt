@@ -7,53 +7,93 @@ import android.graphics.drawable.ColorDrawable
 import android.graphics.drawable.Drawable
 import android.util.AttributeSet
 import android.widget.ImageView
+import kotlin.math.min
 
 class CircleImageView : ImageView {
-	constructor(context: Context) : super(context)
-	constructor(context: Context, attrs: AttributeSet) : super(context, attrs)
-	constructor(context: Context, attrs: AttributeSet, defStyleAttr: Int) : super(context, attrs, defStyleAttr)
 
-	private lateinit var paint: Paint
-	private lateinit var bitmap: Bitmap
+    private lateinit var config: CircleImageViewConfig
+    private var bitmapWidth = 0
+    private var bitmapHeight = 0
+    private lateinit var bitmapPaint: Paint//绘制bitmap的画笔
+    private lateinit var borderPaint: Paint//绘制边框的画笔
+    private var resourceBitmap: Bitmap? = null//存储bitmap
 
-	override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
-		super.onMeasure(widthMeasureSpec, heightMeasureSpec)
-		println("这个时候开始测量")
-	}
+    constructor(context: Context) : super(context)
+    constructor(context: Context, attrs: AttributeSet?) : super(context, attrs)
+    constructor(context: Context, attrs: AttributeSet?, defStyleAttr: Int) : super(context, attrs, defStyleAttr)
 
-	override fun onDraw(canvas: Canvas) {
-//		super.onDraw(canvas)
-		println("这个时候开始绘制")
-		canvas.drawCircle(width / 2F, height / 2F, width / 2F, paint)
-	}
+    fun setConfig(config: CircleImageViewConfig): CircleImageView {
+        this.config.copy(config)
+        return this
+    }
 
-	/**
-	 * 拦截设置图片Bitmap或Drawable
-	 * setImageBitmap最终会调用setImageDrawable
-	 */
-	override fun setImageDrawable(drawable: Drawable?) {
-		super.setImageDrawable(drawable)
-		initBitmap()
-	}
+    fun config(listener: (CircleImageViewConfig) -> CircleImageViewConfig): CircleImageView =
+        setConfig(listener.invoke(config))
 
-	/**
-	 * 将Drawable转换成Bitmap，并存储起来，交给后面的onDraw使用
-	 */
-	private fun initBitmap() {
-		//将drawable转为bitmap
-		bitmap = when (drawable) {
-			is BitmapDrawable -> (drawable as BitmapDrawable).bitmap
-			is ColorDrawable -> Bitmap.createBitmap(2, 2, Bitmap.Config.ARGB_8888)
-			else -> Bitmap.createBitmap(drawable.intrinsicWidth, drawable.intrinsicHeight, Bitmap.Config.ARGB_8888)
-		}
-		if (drawable !is BitmapDrawable) {//如果不是BitmapDrawable，需要将drawable画到bitmap上面
-			val canvas = Canvas(bitmap)
-			drawable.setBounds(0, 0, canvas.width, canvas.height)
-			drawable.draw(canvas)
-		}
-		val bitmapShader = BitmapShader(bitmap, Shader.TileMode.CLAMP, Shader.TileMode.CLAMP)
-		paint = Paint()
-		paint.isAntiAlias = true
-		paint.shader = bitmapShader
-	}
+    override fun onDraw(canvas: Canvas) {
+        if (!config.drawCircle)
+            return super.onDraw(canvas)
+        canvas.drawCircle(bitmapWidth * config.centerX, bitmapHeight * config.centerY, config.circleRadius, bitmapPaint)
+        if (config.drawBorder) {//绘制边框
+            canvas.drawCircle(
+                bitmapWidth * config.centerX,
+                bitmapHeight * config.centerY,
+                config.circleRadius - config.borderWidth / 2F,
+                borderPaint
+            )
+        }
+    }
+
+    /**
+     * 拦截设置图片Bitmap或Drawable
+     * setImageBitmap最终会调用setImageDrawable
+     */
+    override fun setImageDrawable(drawable: Drawable?) {
+        super.setImageDrawable(drawable)
+        initBitmapAndPaint()
+    }
+
+    /**
+     * 将Drawable转换成Bitmap
+     */
+    private fun Drawable.toBitmap(): Bitmap {
+        val bitmap = when (this) {
+            is BitmapDrawable -> this.bitmap
+            is ColorDrawable -> Bitmap.createBitmap(2, 2, BITMAP_CONFIG)
+            else -> Bitmap.createBitmap(this.intrinsicWidth, this.intrinsicHeight, BITMAP_CONFIG)
+        }
+        if (this !is BitmapDrawable) {//如果不是BitmapDrawable，需要将drawable画到bitmap上面
+            val canvas = Canvas(bitmap)
+            drawable.setBounds(0, 0, canvas.width, canvas.height)
+            drawable.draw(canvas)
+        }
+        return bitmap
+    }
+
+    /**
+     * 根据bitmap来初始化配置项
+     */
+    private fun initBitmapAndPaint() {
+        config = CircleImageViewConfig()
+        resourceBitmap = drawable.toBitmap()
+        bitmapHeight = resourceBitmap!!.height
+        bitmapWidth = resourceBitmap!!.width
+        if (config.circleRadius == -1F) {
+            config.circleRadius = min(bitmapHeight, bitmapWidth) / 2F
+        }
+        val bitmapShader = BitmapShader(resourceBitmap!!, Shader.TileMode.CLAMP, Shader.TileMode.CLAMP)
+        bitmapPaint = Paint()
+        bitmapPaint.isAntiAlias = true
+        bitmapPaint.shader = bitmapShader
+
+        borderPaint = Paint()
+        borderPaint.isAntiAlias = true
+        borderPaint.style = Paint.Style.STROKE
+        borderPaint.color = config.borderColor
+        borderPaint.strokeWidth = config.borderWidth
+    }
+
+    companion object {
+        private val BITMAP_CONFIG = Bitmap.Config.ARGB_8888
+    }
 }
