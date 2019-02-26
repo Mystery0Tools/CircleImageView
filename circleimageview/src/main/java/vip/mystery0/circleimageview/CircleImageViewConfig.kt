@@ -12,6 +12,8 @@ class CircleImageViewConfig {
     var centerX = 0.5F//绘制圆形的圆心X比例，默认是0.5
     var centerY = 0.5F//绘制圆形的圆心Y比例，默认是0.5
 
+    var isShowAdditional=false//是否显示额外信息（Pro装饰）
+
     fun isDrawCircle(isDrawCircle: Boolean): CircleImageViewConfig {
         drawCircle = isDrawCircle
         return this

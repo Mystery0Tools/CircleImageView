@@ -23,43 +23,51 @@ class CircleImageView(context: Context, attrs: AttributeSet?, defStyleAttr: Int)
 	constructor(context: Context, attrs: AttributeSet?) : this(context, attrs, 0)
 
 	init {
-		if (!::viewConfig.isInitialized)
-			viewConfig = CircleImageViewConfig()
+		val config = getConfig()
 		val typedArray = context.obtainStyledAttributes(attrs, R.styleable.CircleImageView, defStyleAttr, 0)
 		if (typedArray.hasValue(R.styleable.CircleImageView_draw_circle))
-			viewConfig.drawCircle = typedArray.getBoolean(R.styleable.CircleImageView_draw_circle, true)
+			config.drawCircle = typedArray.getBoolean(R.styleable.CircleImageView_draw_circle, true)
 		if (typedArray.hasValue(R.styleable.CircleImageView_draw_border))
-			viewConfig.drawBorder = typedArray.getBoolean(R.styleable.CircleImageView_draw_border, true)
+			config.drawBorder = typedArray.getBoolean(R.styleable.CircleImageView_draw_border, true)
 		if (typedArray.hasValue(R.styleable.CircleImageView_border_width))
-			viewConfig.borderWidth = typedArray.getDimension(R.styleable.CircleImageView_border_width, viewConfig.borderWidth)
+			config.borderWidth = typedArray.getDimension(R.styleable.CircleImageView_border_width, config.borderWidth)
 		if (typedArray.hasValue(R.styleable.CircleImageView_border_color))
-			viewConfig.borderColor = typedArray.getColor(R.styleable.CircleImageView_border_color, viewConfig.borderColor)
+			config.borderColor = typedArray.getColor(R.styleable.CircleImageView_border_color, config.borderColor)
 		if (typedArray.hasValue(R.styleable.CircleImageView_circle_radius))
-			viewConfig.circleRadius = typedArray.getDimension(R.styleable.CircleImageView_circle_radius, viewConfig.circleRadius)
+			config.circleRadius = typedArray.getDimension(R.styleable.CircleImageView_circle_radius, config.circleRadius)
 		if (typedArray.hasValue(R.styleable.CircleImageView_center_x))
-			viewConfig.centerX = typedArray.getFloat(R.styleable.CircleImageView_center_x, viewConfig.centerX)
+			config.centerX = typedArray.getFloat(R.styleable.CircleImageView_center_x, config.centerX)
 		if (typedArray.hasValue(R.styleable.CircleImageView_center_y))
-			viewConfig.centerY = typedArray.getFloat(R.styleable.CircleImageView_center_y, viewConfig.centerY)
+			config.centerY = typedArray.getFloat(R.styleable.CircleImageView_center_y, config.centerY)
 		typedArray.recycle()
 	}
 
+	@Synchronized
+	fun getConfig(): CircleImageViewConfig {
+		if (!::viewConfig.isInitialized)
+			viewConfig = CircleImageViewConfig()
+		return viewConfig
+	}
+
 	fun setConfig(config: CircleImageViewConfig): CircleImageView {
+		val viewConfig=getConfig()
 		this.viewConfig.copy(config)
 		return this
 	}
 
 	fun config(listener: (CircleImageViewConfig) -> CircleImageViewConfig): CircleImageView =
-			setConfig(listener.invoke(viewConfig))
+			setConfig(listener.invoke(getConfig()))
 
 	override fun onDraw(canvas: Canvas) {
-		if (!viewConfig.drawCircle)
+		val config=getConfig()
+		if (!config.drawCircle)
 			return super.onDraw(canvas)
-		canvas.drawCircle(bitmapWidth * viewConfig.centerX, bitmapHeight * viewConfig.centerY, viewConfig.circleRadius, bitmapPaint)
-		if (viewConfig.drawBorder) {//绘制边框
+		canvas.drawCircle(bitmapWidth * config.centerX, bitmapHeight * config.centerY, config.circleRadius, bitmapPaint)
+		if (config.drawBorder) {//绘制边框
 			canvas.drawCircle(
-					bitmapWidth * viewConfig.centerX,
-					bitmapHeight * viewConfig.centerY,
-					viewConfig.circleRadius - viewConfig.borderWidth / 2F,
+					bitmapWidth * config.centerX,
+					bitmapHeight * config.centerY,
+					config.circleRadius - config.borderWidth / 2F,
 					borderPaint
 			)
 		}
@@ -98,10 +106,9 @@ class CircleImageView(context: Context, attrs: AttributeSet?, defStyleAttr: Int)
 		resourceBitmap = drawable.toBitmap()
 		bitmapHeight = resourceBitmap!!.height
 		bitmapWidth = resourceBitmap!!.width
-		if (!::viewConfig.isInitialized)
-			viewConfig = CircleImageViewConfig()
-		if (viewConfig.circleRadius == -1F) {
-			viewConfig.circleRadius = min(bitmapHeight, bitmapWidth) / 2F
+		val config = getConfig()
+		if (config.circleRadius == -1F) {
+			config.circleRadius = min(bitmapHeight, bitmapWidth) / 2F
 		}
 		val bitmapShader = BitmapShader(resourceBitmap!!, Shader.TileMode.CLAMP, Shader.TileMode.CLAMP)
 		bitmapPaint = Paint()
@@ -111,8 +118,8 @@ class CircleImageView(context: Context, attrs: AttributeSet?, defStyleAttr: Int)
 		borderPaint = Paint()
 		borderPaint.isAntiAlias = true
 		borderPaint.style = Paint.Style.STROKE
-		borderPaint.color = viewConfig.borderColor
-		borderPaint.strokeWidth = viewConfig.borderWidth
+		borderPaint.color = config.borderColor
+		borderPaint.strokeWidth = config.borderWidth
 	}
 
 	companion object {
