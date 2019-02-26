@@ -7,11 +7,18 @@
 	tools:context=".MainActivity">
 
 	<vip.mystery0.circleimageview.CircleImageView
+		android:id="@+id/circleImageView"
 		android:layout_width="wrap_content"
 		android:layout_height="wrap_content"
 		android:src="@drawable/ic_launcher_background"
-		app:center_x="0.2"
-		app:center_y="0.8"
+		app:additional_height="8dp"
+		app:additional_location="right_top"
+		app:additional_margin_horizontal="2dp"
+		app:additional_margin_vertical="2dp"
+		app:additional_src="@color/colorAccent"
+		app:additional_width="16dp"
+		app:center_x="0.5"
+		app:center_y="0.5"
 		app:draw_border="false"
 		app:layout_constraintBottom_toBottomOf="parent"
 		app:layout_constraintLeft_toLeftOf="parent"

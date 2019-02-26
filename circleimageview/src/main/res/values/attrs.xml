@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 	<declare-styleable name="CircleImageView">
+		<attr name="additional_src" format="reference" />
 		<attr name="draw_circle" format="boolean" />
 		<attr name="draw_border" format="boolean" />
 		<attr name="border_width" format="dimension" />
@@ -8,5 +9,19 @@
 		<attr name="circle_radius" format="dimension" />
 		<attr name="center_x" format="float" />
 		<attr name="center_y" format="float" />
+		<attr name="additional_location" format="enum">
+			<enum name="left" value="1" />
+			<enum name="top" value="2" />
+			<enum name="right" value="3" />
+			<enum name="bottom" value="4" />
+			<enum name="left_top" value="5" />
+			<enum name="right_top" value="6" />
+			<enum name="left_bottom" value="7" />
+			<enum name="right_bottom" value="8" />
+		</attr>
+		<attr name="additional_width" format="dimension" />
+		<attr name="additional_height" format="dimension" />
+		<attr name="additional_margin_horizontal" format="dimension" />
+		<attr name="additional_margin_vertical" format="dimension" />
 	</declare-styleable>
 </resources>
