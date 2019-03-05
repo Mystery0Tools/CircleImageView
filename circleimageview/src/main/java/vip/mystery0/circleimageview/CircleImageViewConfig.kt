@@ -21,7 +21,7 @@ class CircleImageViewConfig {
 	var drawBorder = true
 		//是否绘制边框
 		private set
-	var drawAdditional = true
+	var drawAdditional = false
 		//是否显示额外信息（Pro装饰）
 		private set
 	var borderWidth = 1F

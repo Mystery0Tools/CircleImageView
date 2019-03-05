@@ -11,10 +11,13 @@ import androidx.core.content.ContextCompat
 import kotlin.math.max
 import kotlin.math.min
 import android.graphics.RectF
+import android.net.Uri
+import android.util.Log
 
 
 class CircleImageView(context: Context, attrs: AttributeSet?, defStyleAttr: Int) :
 		ImageView(context, attrs, defStyleAttr) {
+	private val TAG = "CircleImageView"
 
 	private lateinit var viewConfig: CircleImageViewConfig
 	private var bitmapWidth = 0
@@ -25,6 +28,7 @@ class CircleImageView(context: Context, attrs: AttributeSet?, defStyleAttr: Int)
 	private var resourceBitmap: Bitmap? = null//存储bitmap
 	private var additionalBitmap: Bitmap? = null//存储额外的图片
 	private lateinit var additionalRectF: RectF
+	private val SCALE_TYPE = ScaleType.CENTER_CROP
 
 	constructor(context: Context) : this(context, null)
 	constructor(context: Context, attrs: AttributeSet?) : this(context, attrs, 0)
@@ -36,6 +40,8 @@ class CircleImageView(context: Context, attrs: AttributeSet?, defStyleAttr: Int)
 			config.isDrawCircle(a.getBoolean(R.styleable.CircleImageView_draw_circle, config.drawCircle))
 		if (a.hasValue(R.styleable.CircleImageView_draw_border))
 			config.isDrawBorder(a.getBoolean(R.styleable.CircleImageView_draw_border, config.drawBorder))
+		if (a.hasValue(R.styleable.CircleImageView_draw_additional))
+			config.isDrawAdditional(a.getBoolean(R.styleable.CircleImageView_draw_additional, config.drawAdditional))
 		if (a.hasValue(R.styleable.CircleImageView_border_width))
 			config.setBorderWidth(a.getDimension(R.styleable.CircleImageView_border_width, config.borderWidth))
 		if (a.hasValue(R.styleable.CircleImageView_border_color))
@@ -151,18 +157,31 @@ class CircleImageView(context: Context, attrs: AttributeSet?, defStyleAttr: Int)
 		val config = getConfig()
 		if (!config.drawCircle && !config.drawAdditional)
 			return super.onDraw(canvas)
+		if (!::bitmapPaint.isInitialized) {
+			Log.w(TAG, "bitmap paint is not init!")
+			return super.onDraw(canvas)
+		}
 		canvas.drawCircle(bitmapWidth * config.centerX, bitmapHeight * config.centerY, config.circleRadius, bitmapPaint)
 		if (config.drawBorder) {//绘制边框
-			canvas.drawCircle(
-					bitmapWidth * config.centerX,
-					bitmapHeight * config.centerY,
-					config.circleRadius - config.borderWidth / 2F,
-					borderPaint
-			)
+			if (!::borderPaint.isInitialized)
+				Log.w(TAG, "border paint is not init!")
+			else
+				canvas.drawCircle(
+						bitmapWidth * config.centerX,
+						bitmapHeight * config.centerY,
+						config.circleRadius - config.borderWidth / 2F,
+						borderPaint
+				)
 		}
-		if (config.drawAdditional && additionalBitmap != null)
-			canvas.drawBitmap(additionalBitmap!!, null, additionalRectF, additionalPaint)
+		if (config.drawAdditional && additionalBitmap != null) {
+			if (!::additionalPaint.isInitialized)
+				Log.w(TAG, "additional paint is not init!")
+			else
+				canvas.drawBitmap(additionalBitmap!!, null, additionalRectF, additionalPaint)
+		}
 	}
+
+	override fun getScaleType(): ScaleType = SCALE_TYPE
 
 	fun setAdditionImageResource(resId: Int) = setAdditionalImageDrawable(ContextCompat.getDrawable(context, resId))
 
@@ -178,6 +197,16 @@ class CircleImageView(context: Context, attrs: AttributeSet?, defStyleAttr: Int)
 		additionalPaint.isAntiAlias = true
 		additionalPaint.style = Paint.Style.FILL
 		updateConfig()
+	}
+
+	override fun setImageResource(resId: Int) {
+		super.setImageResource(resId)
+		initBitmapAndPaint()
+	}
+
+	override fun setImageURI(uri: Uri?) {
+		super.setImageURI(uri)
+		initBitmapAndPaint()
 	}
 
 	/**

@@ -4,6 +4,7 @@
 		<attr name="additional_src" format="reference" />
 		<attr name="draw_circle" format="boolean" />
 		<attr name="draw_border" format="boolean" />
+		<attr name="draw_additional" format="boolean" />
 		<attr name="border_width" format="dimension" />
 		<attr name="border_color" format="color" />
 		<attr name="circle_radius" format="dimension" />
