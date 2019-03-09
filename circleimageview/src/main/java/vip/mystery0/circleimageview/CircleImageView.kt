@@ -95,8 +95,10 @@ class CircleImageView(context: Context, attrs: AttributeSet?, defStyleAttr: Int)
 		if (config.circleRadius == -1F) {
 			config.setCircleRadius(min(bitmapHeight, bitmapWidth) / 2F)
 		}
-		borderPaint.color = config.borderColor
-		borderPaint.strokeWidth = config.borderWidth
+		if (::borderPaint.isInitialized) {
+			borderPaint.color = config.borderColor
+			borderPaint.strokeWidth = config.borderWidth
+		}
 	}
 
 	private fun updateAdditionalConfig(config: CircleImageViewConfig) {
