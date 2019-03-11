@@ -21,6 +21,7 @@
 		app:center_y="0.5"
 		app:draw_additional="true"
 		app:draw_border="true"
+		app:draw_circle="true"
 		app:layout_constraintBottom_toBottomOf="parent"
 		app:layout_constraintLeft_toLeftOf="parent"
 		app:layout_constraintRight_toRightOf="parent"
