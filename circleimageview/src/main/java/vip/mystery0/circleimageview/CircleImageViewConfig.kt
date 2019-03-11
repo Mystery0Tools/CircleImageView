@@ -15,29 +15,32 @@ class CircleImageViewConfig {
 		const val RIGHT_BOTTOM = 8
 	}
 
+	//是否裁剪成圆形
 	var drawCircle = true
-		//是否裁剪成圆形
 		private set
+	//是否绘制边框
 	var drawBorder = true
-		//是否绘制边框
 		private set
+	//是否显示额外信息（Pro装饰）
 	var drawAdditional = false
-		//是否显示额外信息（Pro装饰）
 		private set
-	var borderWidth = 1F
-		//边框宽度
+	//边框宽度
+	var borderWidth = 0F
 		private set
+	//边框颜色
 	var borderColor = Color.BLACK
-		//边框颜色
 		private set
-	var circleRadius = -1F
-		//圆形的半径
+	//边框的半径
+	var borderRadius = 0F
 		private set
+	//圆形的半径
+	var circleRadius = 0F
+		private set
+	//绘制圆形的圆心X比例，默认是0.5
 	var centerX = 0.5F
-		//绘制圆形的圆心X比例，默认是0.5
 		private set
+	//绘制圆形的圆心Y比例，默认是0.5
 	var centerY = 0.5F
-		//绘制圆形的圆心Y比例，默认是0.5
 		private set
 
 	var additionalLocation = Location.RIGHT_TOP
@@ -75,6 +78,13 @@ class CircleImageViewConfig {
 
 	fun setBorderColor(@ColorInt borderColor: Int): CircleImageViewConfig {
 		this.borderColor = borderColor
+		return this
+	}
+
+	fun setBorderRadius(borderRadius: Float): CircleImageViewConfig {
+		if (borderRadius < 0F)
+			throw RuntimeException("border radius cannot be less than zero.")
+		this.borderRadius = borderRadius
 		return this
 	}
 

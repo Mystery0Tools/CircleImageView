@@ -8,8 +8,8 @@
 
 	<vip.mystery0.circleimageview.CircleImageView
 		android:id="@+id/circleImageView"
-		android:layout_width="wrap_content"
-		android:layout_height="wrap_content"
+		android:layout_width="40dp"
+		android:layout_height="40dp"
 		android:src="@drawable/ic_launcher_background"
 		app:additional_height="8dp"
 		app:additional_location="right_top"
@@ -19,7 +19,8 @@
 		app:additional_width="16dp"
 		app:center_x="0.5"
 		app:center_y="0.5"
-		app:draw_border="false"
+		app:draw_additional="true"
+		app:draw_border="true"
 		app:layout_constraintBottom_toBottomOf="parent"
 		app:layout_constraintLeft_toLeftOf="parent"
 		app:layout_constraintRight_toRightOf="parent"
